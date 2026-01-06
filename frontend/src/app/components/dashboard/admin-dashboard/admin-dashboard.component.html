@@ -1,0 +1,30 @@
+<!-- src/app/components/admin/admin.component.html -->
+<div class="container mt-5">
+  <div class="text-center mb-5">
+    <h1 class="display-4">Admin Dashboard</h1>
+    <p class="lead">Manage registered companies, their inventory, and employees effectively.</p>
+    <hr class="my-4 w-50 mx-auto">
+  </div>
+
+  <div class="row justify-content-center">
+    <!-- Company Management Card -->
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm border-0">
+        <img src="https://img.freepik.com/premium-vector/inventory-management-with-goods-demand-stock-supply-tiny-person-concept_327176-340.jpg?ga=GA1.1.519532885.1718444428&semt=ais_hybrid" class="card-img-top" alt="Companies">
+        <div class="card-body text-center">
+          <h5 class="card-title">Manage Companies</h5>
+          <p class="card-text">View and manage all registered companies in the system.</p>
+          <button class="btn btn-outline-primary btn-lg fw-bold" [routerLink]="['/company-list']">View Companies</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Inventory Management Card -->
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm border-0">
+        <img src="https://img.freepik.com/free-vector/isometric-warehouse-logistic-template_1284-39387.jpg?ga=GA1.1.519532885.1718444428&semt=ais_hybrid" class="card-img-top" alt="Inventory Management">
+      </div>
+    </div>
+    
+  </div>
+</div>

@@ -1,0 +1,402 @@
+<div class="container mt-4">
+  <!-- Error message display -->
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Company details header -->
+  <div class="text-center mb-4">
+    <h2 class="display-6 fw-bold text-primary">Inventories in {{ companyDetails?.companyName }}</h2>
+    <p class="text-muted">Manage and view inventories</p>
+  </div>
+
+  <!-- Inventory search input -->
+  <div class="input-group mb-3">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Search by product name"
+      [(ngModel)]="searchTerm"
+      (input)="onSearchInventory()"
+      aria-label="Search by product name"
+    />
+    <span class="input-group-text"><i class="bi bi-search"></i></span>
+  </div>
+
+  <div class="d-flex align-items-center mb-4">
+    <!-- Out-of-stock filter -->
+    <div class="form-check me-3">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        id="showOutOfStock"
+        [(ngModel)]="showOutOfStock"
+        (change)="onToggleOutOfStock()"
+        [disabled]="showIsOrder"
+      />
+      <label class="form-check-label" for="showOutOfStock">
+        Show Out-of-Stock Items Only
+      </label>
+    </div>
+  
+    <!-- IsReorder filter -->
+    <div class="form-check">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        id="showIsOrder"
+        [(ngModel)]="showIsOrder"
+        (change)="onToggleIsReorder()"
+        [disabled]="showOutOfStock"
+      />
+      <label class="form-check-label" for="showIsOrder">
+        Show Items to be Reordered
+      </label>
+    </div>
+  </div>  
+
+  <!-- Inventory list table -->
+  <table class="table table-striped table-hover shadow-sm text-center align-middle" *ngIf="inventories.length > 0; else noInventories">
+    <thead class="table-primary text-white">
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Product Name</th>
+        <th scope="col">Description</th>
+        <th scope="col">Quantity in Stock</th>
+        <th scope="col">Price</th>
+        <th scope="col">Stock Valuation</th> <!-- New column for stock valuation -->
+        <th scope="col">Stock Status</th> <!-- New column for reorder point alert -->
+        <th scope="col">Opening Stock</th>
+        <th scope="col">Reciepts</th>
+        <th scope="col">Issues</th>
+        <th scope="col">Closing Stock</th>
+        <th scope="col" class="text-center">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let inventory of filteredInventories">
+        <td>{{ inventory.id }}</td>
+        <td>
+          <!-- Make product name clickable -->
+          <a href="javascript:void(0)" (click)="onViewInventory(inventory)">
+            {{ inventory.productName }}
+          </a>
+        </td>  
+        <td>
+          <a href="javascript:void(0)" (click)="viewDescription(inventory.description)">
+            view
+          </a>
+        </td>        
+        <td [class.text-danger]="inventory.qtyInStock === 0">{{ inventory.qtyInStock }}</td>
+        <td>{{ inventory.price | currency:'INR' }}</td>
+        <td>{{ (inventory.qtyInStock * inventory.price) | currency:'INR' }}</td> <!-- Stock valuation calculation -->
+        <td>
+          <!-- Alert when stock is below reorder point -->
+          <span *ngIf="inventory.qtyInStock < inventory.reorderPoint && inventory.qtyInStock >= inventory.minimumStock" class="fw-bold text-warning">Reorder Alert</span>
+          <span *ngIf="inventory.qtyInStock >= inventory.reorderPoint" class="fw-bold text-success">In Stock</span>
+          <span *ngIf="inventory.qtyInStock < inventory.minimumStock && inventory.qtyInStock" class="fw-bold text-danger">Low Stock</span>
+          <span *ngIf="inventory.qtyInStock === 0" class="fw-bold text-secondary">Out of Stock</span>
+        </td>
+        <td>{{ inventory.openingStock }}</td>
+        <td>{{ inventory.receipts }}</td>
+        <td>{{ inventory.issues }}</td>
+        <td>{{ inventory.closingStock }}</td>
+        <td class="text-center">
+          <button class="btn btn-outline-secondary btn-sm me-2 fw-bold" (click)="onEditInventory(inventory)">
+            <i class="fas fa-edit"></i> Edit
+          </button>
+          <button class="btn btn-outline-danger btn-sm fw-bold" (click)="onDeleteInventory(inventory.id)">
+            <i class="fas fa-trash-alt"></i> Delete
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <!-- Button to open modal for adding inventory -->
+  <div class="d-flex justify-content-center align-items-center gap-4 mt-4">
+    <button class="btn btn-primary btn-lg fw-bold" (click)="openAddInventoryModal()">
+      <i class="fas fa-plus-circle"></i> Add Inventory
+    </button>
+    <button class="btn btn-secondary btn-lg fw-bold" (click)="onRefreshInventory()">
+      <i class="fas fa-sync-alt"></i> Refresh Inventory
+    </button>
+  </div>
+  
+
+  <!-- No inventories message -->
+  <ng-template #noInventories>
+    <p class="text-muted">No inventories found for this company.</p>
+  </ng-template>
+
+  <!-- Add Inventory Modal -->
+  <div class="modal fade" #addInventoryModal tabindex="-1" aria-labelledby="addInventoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="addInventoryModalLabel">Add New Inventory</h5>
+          <button type="button" class="btn-close text-white" aria-label="Close" (click)="closeAddModal()"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Add Inventory Form -->
+          <form (ngSubmit)="onAddInventory()" #inventoryForm="ngForm" novalidate>
+            <div class="mb-3">
+              <label for="inventoryProductName" class="form-label">Product Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="inventoryProductName"
+                [(ngModel)]="newInventory.productName"
+                name="productName"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="inventoryDescription" class="form-label">Description</label>
+              <input
+                type="text"
+                class="form-control"
+                id="inventoryDescription"
+                [(ngModel)]="newInventory.description"
+                name="description"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="inventoryPrice" class="form-label">Price</label>
+              <input
+                type="number"
+                class="form-control"
+                id="inventoryPrice"
+                [(ngModel)]="newInventory.price"
+                name="price"
+                required
+                min="1"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="inventoryMinimumStock" class="form-label">Minimum Stock</label>
+              <input
+                type="number"
+                class="form-control"
+                id="inventoryMinimumStock"
+                [(ngModel)]="newInventory.minimumStock"
+                name="minimumStock"
+                required
+                min="0"
+              />
+            </div>  
+
+            <div class="mb-3">
+              <label for="inventoryBufferStock" class="form-label">Buffer Stock</label>
+              <input
+                type="number"
+                class="form-control"
+                id="inventoryBufferStock"
+                [(ngModel)]="newInventory.bufferStock"
+                name="bufferStock"
+                required
+                min="0"
+              />
+            </div>       
+
+            <button type="submit" class="btn btn-primary" [disabled]="inventoryForm.invalid">Save Inventory</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Inventory Modal -->
+  <div class="modal fade" #editInventoryModal tabindex="-1" aria-labelledby="editInventoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="editInventoryModalLabel">Edit Inventory</h5>
+          <button type="button" class="btn-close text-white" aria-label="Close" (click)="closeEditModal()"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Edit Inventory Form -->
+          <form (ngSubmit)="onUpdateInventory(
+            inventoryProductName.value, 
+            inventoryDescription.value,
+            inventoryPrice.value,
+            inventoryReceipts.value,
+            inventoryIssues.value,
+            inventoryMinimumStock.value,
+            inventoryBufferStock.value
+            )" #editInventoryForm="ngForm" novalidate>
+            <div class="mb-3">
+              <label for="inventoryProductName" class="form-label">Product Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="inventoryProductName"
+                #inventoryProductName
+                [value]="selectedInventory?.productName"
+                placeholder="Enter name of the product"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="inventoryDescription" class="form-label">Description</label>
+              <input
+                type="text"
+                class="form-control"
+                id="inventoryDescription"
+                #inventoryDescription
+                [value]="selectedInventory?.description"
+                placeholder="Enter product's description"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="inventoryPrice" class="form-label">Price</label>
+              <input
+                type="number"
+                class="form-control"
+                id="inventoryPrice"
+                #inventoryPrice
+                [value]="selectedInventory?.price"
+                placeholder="Enter product's price"
+                required
+                min="1"
+              />
+            </div>
+            
+            <div class="mb-3">
+              <label for="inventoryReceipts" class="form-label">Receipts</label>
+              <input
+                type="number"
+                class="form-control"
+                id="inventoryReceipts"
+                #inventoryReceipts
+                [value]="selectedInventory?.receipts"
+                required
+                min="0"
+              />
+            </div>
+            
+            <div class="mb-3">
+              <label for="inventoryIssues" class="form-label">Issues</label>
+              <input
+                type="number"
+                class="form-control"
+                id="inventoryIssues"
+                #inventoryIssues
+                [value]="selectedInventory?.issues"
+                required
+                min="0"
+                [max]="selectedInventory?.qtyInStock"
+                
+              />
+              
+            </div>
+            
+            <div class="mb-3">
+              <label for="inventoryMinimumStock" class="form-label">Minimum Stock</label>
+              <input
+                type="number"
+                class="form-control"
+                id="inventoryMinimumStock"
+                #inventoryMinimumStock
+                [value]="selectedInventory?.minimumStock"
+                required
+                min="0"
+              />
+            </div>   
+
+            <div class="mb-3">
+              <label for="inventoryBufferStock" class="form-label">Buffer Stock</label>
+              <input
+                type="number"
+                class="form-control"
+                id="inventoryBufferStock"
+                #inventoryBufferStock
+                [value]="selectedInventory?.bufferStock"
+                required
+                min="0"
+              />
+            </div>    
+
+            <button type="submit" class="btn btn-primary" [disabled]="!inventoryProductName.value || !inventoryDescription.value || !inventoryPrice.value">Save Changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Inventory Modal -->
+  <div #viewInventoryModal class="modal fade" tabindex="-1" aria-labelledby="viewInventoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="viewInventoryModalLabel">Inventory Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeViewModal()"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Product Id:</strong> {{ selectedInventory?.id }}</p>
+          <p><strong>Product Name:</strong> {{ selectedInventory?.productName }}</p>
+          <p><strong>Description:</strong> {{ selectedInventory?.description }}</p>
+          <p><strong>Quantity of Stock:</strong> {{ selectedInventory?.qtyInStock }}</p>
+          <p><strong>Price:</strong> {{ selectedInventory?.price | currency:'INR' }}</p>
+          <p><strong>Stock Valuation:</strong> {{ selectedInventory?.stockValue | currency:'INR' }}</p>
+          <p><strong>Reorder Point:</strong> {{ selectedInventory?.reorderPoint }}</p>
+          <p><strong>Opening Stock:</strong> {{ selectedInventory?.openingStock }}</p>
+          <p><strong>Reciepts:</strong> {{ selectedInventory?.receipts }}</p>
+          <p><strong>Issues:</strong> {{ selectedInventory?.issues }}</p>
+          <p><strong>Closing Stock:</strong> {{ selectedInventory?.closingStock }}</p>
+          <p><strong>Minimum Stock to be Maintained:</strong> {{ selectedInventory?.minimumStock }}</p>
+          <p><strong>Buffer Stock for safety margin:</strong> {{ selectedInventory?.bufferStock }}</p>
+          <p><strong>Reorder Status:</strong> {{ selectedInventory?.isReorder }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="closeViewModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for displaying description -->
+  <div
+  #descriptionModal
+  class="modal fade"
+  tabindex="-1"
+  aria-labelledby="descriptionModalLabel"
+  aria-hidden="true"
+  >
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="descriptionModalLabel">Inventory Description</h5>
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="closeDescriptionModal()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        {{ selectedDescription }}
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="closeDescriptionModal()"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+  </div>
+
+
+</div>

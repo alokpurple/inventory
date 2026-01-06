@@ -1,0 +1,18 @@
+# Frontend (Angular/Node)
+**/node_modules/
+**/dist/
+**/.angular/
+npm-debug.log
+yarn-error.log
+
+# Backend (Java/Spring)
+**/target/
+**/*.class
+**/.mvn/
+*.log
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+.DS_Store

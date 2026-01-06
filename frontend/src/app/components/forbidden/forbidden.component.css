@@ -1,0 +1,23 @@
+/* Add custom styling for the Forbidden page */
+.container {
+    max-width: 600px;
+  }
+  
+  .alert {
+    padding: 3rem;
+    border-radius: 10px;
+  }
+  
+  h1 {
+    font-size: 5rem;
+  }
+  
+  h4 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .lead {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+  }

@@ -1,0 +1,120 @@
+<div class="container mt-5 position-relative overflow-hidden">
+  <!-- Animated Background -->
+  <div class="background-circle bg-primary position-absolute top-0 start-0"></div>
+
+  <!-- Header Section -->
+  <div class="text-center mb-5">
+    <h1 class="display-4 animate__animated animate__fadeInDown">{{ welcomeMessage }}</h1>
+    <p class="lead animate__animated animate__fadeInUp delay-1s">
+      Manage your company inventories efficiently with our platform.
+    </p>
+    <hr class="my-4 w-50 mx-auto animate__animated animate__zoomIn delay-2s">
+
+    <!-- Animated Line -->
+    <div class="moving-text-wrapper">
+      <p class="moving-text">
+        Explore and manage your company details, employees, and inventory all in one place.
+      </p>
+    </div>
+  </div>
+
+  <!-- Inventory Card Section -->
+  <div class="row justify-content-center">
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0">
+        <img
+          src="https://img.freepik.com/free-vector/handling-order-processing-abstract-concept-vector-illustration-order-documentation-processing-system-handling-customer-request-logistics-automated-logistics-operations-abstract-metaphor_335657-1789.jpg?ga=GA1.1.519532885.1718444428&semt=ais_hybrid"
+          class="card-img-top"
+          alt="Inventory Overview"
+        />
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0 animate__animated animate__zoomIn delay-1s">
+        <img
+          src="https://img.freepik.com/premium-vector/illustration-warehouse-employees-sorting-packages-according-type-goods_1150725-862.jpg?ga=GA1.1.519532885.1718444428&semt=ais_hybrid"
+          class="card-img-top"
+          alt="Warehouse Operations"
+        />
+        <div class="card-body text-center">
+          <h6 class="card-title text-muted" *ngIf="!isLoggedIn"><a href="/login">Login</a> / <a href="/register">Register</a> to Get Started 🚀</h6>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0">
+        <img
+          src="https://img.freepik.com/free-vector/warehouse-worker-checking-inventory_3446-395.jpg?ga=GA1.1.519532885.1718444428&semt=ais_hybrid"
+          class="card-img-top"
+          alt="Stock Management"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Styles for Background and Hover Effects -->
+<style>
+  .background-circle {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    animation: float 1s infinite ease-in-out alternate;
+    z-index: -1;
+    opacity: 0.3;
+  }
+  .background-circle.bg-primary {
+    left: -100px;
+    top: -100px;
+    background-color: #007bff;
+  }
+  
+  @keyframes float {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(20px);
+    }
+  }
+
+  .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+</style>
+
+<!-- Styles for Moving Text -->
+<style>
+  .moving-text-wrapper {
+    overflow: hidden;
+    position: relative;
+    width: 100%; /* Adjust based on your layout */
+  }
+
+  .moving-text {
+    display: inline-block;
+    white-space: nowrap;
+    position: relative;
+    animation: moveLeft 19s linear infinite;
+    font-size: 1.2rem; /* Adjust the font size if needed */
+    color: #6c757d; /* Text color */
+  }
+
+  @keyframes moveLeft {
+    0% {
+      transform: translateX(100%); /* Start outside the right boundary */
+    }
+    100% {
+      transform: translateX(-100%); /* Move to the left boundary */
+    }
+  }
+</style>
+
+<!-- Include Animate.css for Animations -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+/>

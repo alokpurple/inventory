@@ -1,0 +1,52 @@
+<div class="container mt-5">
+  <div class="text-center mb-4">
+    <h2 class="display-6 fw-bold text-primary">Company Details</h2>
+    <p class="text-muted">Manage and view your company details, inventory, and employees</p>
+  </div>
+
+  <!-- Loading message while fetching company details -->
+  <div *ngIf="!companyDetails" class="text-center">
+    <p>Loading company details...</p>
+  </div>
+
+  <!-- Display company details if available -->
+  <div *ngIf="companyDetails" class="card shadow-lg p-3 mb-5 rounded" style="background-color: #e9e9e9; padding: 1rem;">
+    <div class="row g-0">
+      <!-- Placeholder image -->
+      <div class="col-md-4">
+        <img src="https://cdn.pixabay.com/photo/2019/04/29/16/11/work-4166471_640.png" class="img-fluid rounded-start" alt="Company Image">
+      </div>
+
+      <!-- Company details section -->
+      <div class="col-md-8">
+        <div class="card-body mt-5 py-5 px-5">
+          <h3 class="card-title text-primary">{{ companyDetails.companyName }}</h3>
+          <p class="card-text">
+            <strong>Location:</strong> {{ companyDetails.location }}
+          </p>
+          <p class="card-text">
+            <strong>Capacity:</strong> {{ companyDetails.capacity }}
+          </p>
+          <p class="card-text">
+            <strong>Username:</strong> {{ companyDetails.user?.username }}
+          </p>
+
+          <!-- Button group for navigation -->
+          <div class="mt-4">
+            <button class="btn btn-outline-primary me-2 fw-bold" [routerLink]="['/inventory-list', companyDetails.id]">
+              View Inventory
+            </button>
+            <button class="btn btn-outline-secondary fw-bold" [routerLink]="['/employee-list', companyDetails.id]">
+              View Employees
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error message display -->
+  <div *ngIf="errorMessage" class="alert alert-danger text-center mt-3">
+    {{ errorMessage }}
+  </div>
+</div>
