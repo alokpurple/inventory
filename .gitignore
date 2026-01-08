@@ -4,3 +4,33 @@
 *.iml
 .attach/
 .claude/
+
+# Frontend (Angular)
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/*.log
+
+# Backend (Spring Boot)
+backend/target/
+backend/*.log
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+
+# Environment secrets (if you create them)
+.env
+.env.local
+.env.production
+secrets.properties
+credentials.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

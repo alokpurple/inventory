@@ -18,14 +18,19 @@ The backend is configured to use **PostgreSQL** for both local development and p
 
 ```bash
 cd backend
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
+
+# PowerShell
+$env:SPRING_PROFILES_ACTIVE="dev"; mvn spring-boot:run
+
+# CMD
+set SPRING_PROFILES_ACTIVE=dev && mvn spring-boot:run
 ```
 
 Or in your IDE, set the active profile to `dev`:
 - **IntelliJ IDEA**: Edit Run Configuration → Active profiles: `dev`
-- **VS Code**: Add `--spring.profiles.active=dev` to launch arguments
+- **VS Code**: Add environment variable `SPRING_PROFILES_ACTIVE=dev`
 
-The backend will start on `http://localhost:8080`
+The backend will start on `http://localhost:8080` (configured in application-dev.properties)
 
 ### Frontend (Angular)
 
