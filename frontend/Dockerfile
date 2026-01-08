@@ -12,4 +12,4 @@ COPY --from=build /app/dist/jwt-frontend/browser /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Replace API_URL_PLACEHOLDER with actual API_URL and start nginx
-CMD ["/bin/sh", "-c", "find /usr/share/nginx/html -type f -name '*.js' -exec sed -i \"s|API_URL_PLACEHOLDER|$API_URL|g\" {} + && nginx -g 'daemon off;'"]
+CMD ["/bin/sh", "-c", "echo 'Replacing API_URL_PLACEHOLDER with' \"${API_URL:-http://localhost:8080}\" && find /usr/share/nginx/html -type f \\( -name '*.js' -o -name '*.mjs' \\) -exec sed -i \"s|API_URL_PLACEHOLDER|${API_URL:-http://localhost:8080}|g\" {} \\; && echo 'Starting nginx...' && nginx -g 'daemon off;'"]
