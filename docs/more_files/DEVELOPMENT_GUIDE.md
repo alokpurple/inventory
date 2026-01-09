@@ -100,7 +100,7 @@ Already configured in `.gitignore`:
 ### Backend won't start locally
 - **Error**: "URL must start with 'jdbc'"
   - **Solution**: Make sure you're running with the `dev` profile
-  - Command: `mvn spring-boot:run -Dspring-boot.run.profiles=dev`
+  - Command: `mvn spring-boot:run "-Dspring-boot.run.profiles=dev"`
 
 ### Frontend can't connect to backend
 - **Error**: CORS or network error
